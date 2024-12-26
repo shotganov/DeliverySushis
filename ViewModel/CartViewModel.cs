@@ -123,19 +123,28 @@ namespace DeliverySushi.ViewModel
         }
         public async Task MakeOrder(int sum, string name, string adress, string phone)
         {
-           
+            try
+            {
+                await cartModel.DeleteCartItems();
 
-            await cartModel.DeleteCartItems();
+                var newOrder = await orderModel.CreateNewOrder(sum, name, adress, phone);
 
-            var newOrder = await orderModel.CreateNewOrder(sum, name, adress, phone);
-              
-            await order_itemModel.CreateOrder_Items(CartItems, newOrder);
+                await order_itemModel.CreateOrder_Items(CartItems, newOrder);
 
-            OrderUpdated?.Invoke(this, EventArgs.Empty);
+                OrderUpdated?.Invoke(this, EventArgs.Empty);
 
-            CartItems = new ObservableCollection<object>();
+                CartItems = new ObservableCollection<object>();
 
-            Sum = 0;
+                Sum = 0;
+
+                MessageBox.Show("Вы успешно сделали заказ!");
+            }
+
+            catch
+            {
+                MessageBox.Show("Ошбика, что-то пошло не так :(");
+            }
+          
 }
         private async Task LoadCartItems()
         {
